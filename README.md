@@ -8,7 +8,7 @@ The producer and consumer problem is an extremely popular programming paradigm. 
 Our project goal is to show the practical application of blocking data structures in long running tasks. We are creating a Python application that will have a blocking queue represented by Redis, producers which are represented by the user, and consumer which are represented by Redis workers. Redis is an in-memory data structure store. Redis supports different kinds of abstract data structures such as lists, sets, stacks, and queues. Our main interest is being able to parallelize tasks with a queue and multiple workers. The tasks that are queued will be long tasks such as web-scrapping, heavy math computations, etc. 
 
 
-* ![Screen Shot 2022-03-25 at 2 08 59 AM](https://user-images.githubusercontent.com/62866287/160064838-cb432763-0539-4f68-bc0d-c08e929023e1.png)
+![Screen Shot 2022-03-25 at 10 50 40 AM](https://user-images.githubusercontent.com/62866287/160144542-b5bd8c61-6034-44eb-8e1d-3e6518f036ef.png)
 
 
 
