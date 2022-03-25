@@ -6,14 +6,11 @@ thread_number = input()
 
 print("Select the queue to consume from: ")
 
-print("1. ")
-print("2. ")
-print("3. ")
-
-
+print("1. queue_one")
+print("2. queue_two")
+print("3. queue_three")
 
 task_number = input()
-
 
 listen_on_queue_name = ""
 
@@ -31,8 +28,7 @@ else:
     else:
         listen_on_queue_name = "queue_three"
 
-
-    command = "python3 create_thread.py "+ listen_on_queue_name
+    command = "python3 create_thread.py " + listen_on_queue_name
 
     for i in range(int(thread_number) - 1):
         command = command + f"& python3 create_thread.py {listen_on_queue_name}"
