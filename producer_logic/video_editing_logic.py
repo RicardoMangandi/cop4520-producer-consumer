@@ -2,7 +2,7 @@ import cv2
 
 def produce_video_split(num_of_threads):
     #file_location = "/Users/ricardomangandi/Desktop/python/cv/Watford-vs-Liverpool-0-5-WISELOADED-HIGHLIGHTS.mp4"
-    file_location = "/Users/ricardomangandi/Desktop/python/download/video1.mp4"
+    file_location = "/Users/ricardomangandi/Downloads/scene-2.mov"
 
     cap = cv2.VideoCapture(file_location)
 
