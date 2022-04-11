@@ -1,52 +1,44 @@
-##############Redis Imports Start Here###########################
-
+############## Redis Imports Start Here ###########################
+import queue
 from redis import Redis
 from rq import Queue, Worker
 from rq.registry import StartedJobRegistry
 
-#################Redis Imports End Here########################
+################# Redis Imports End Here ########################
 
 ############### Misc. Imports ####################################
 
 import sys
 from datetime import datetime
-
+import time
 ############### Misc. Imports ####################################
 
 
 ########### From task_def folder #################################
 
+from task_def import do_task_1
+
 from task_def import do_video_split
-
-########### From task_def folder #################################
-
+from task_def import do_csv_parse
+from task_def import do_webscrape
 
 ########### From producer_logic folder ###########################
 
 from producer_logic import video_editing_logic
 
-########### From producer_logic folder ###########################
 
+##################################################################
 
-####################################################################################
+#CONFIG
 
-def selection_driver(selected_queue,num_of_threads):
-    if selected_queue == str(2):
+# list of csv files to parse
+csv_files = ['../../csv_files/ADP_data.csv', '../../csv_files/AAL_data.csv', '../../csv_files/ABC_data.csv']
+searchFor = '2013'
 
-        print("You have selected to split videos.")
-        list_returned = video_editing_logic.produce_video_split(num_of_threads=num_of_threads)
-        task_list = []
-        for i in list_returned:
-            task = q_2.enqueue(do_video_split.do_video_split,i)
-            task_list.append(task)
-        
-        return task_list
+# list of urls to try for webscraping
+url_list = ['http://nvie.com', 'https://en.wikipedia.org/wiki/Main_Page']
 
-
-####################################################################################
-
-
-
+#######################################################################################################
 now = datetime.now()
 
 current_time = now.strftime("%H:%M:%S")
@@ -57,14 +49,54 @@ q_2 = Queue(name="queue_two", connection=Redis(), default_timeout=-1) # Ricardo 
 
 q_3 = Queue(name="queue_three", connection=Redis(),default_timeout=-1) # Kyle Queue Webscrapping Queue
 
-num_of_threads = Worker.count(connection=Redis())
+q_0 = Queue(name="queue_zero", connection=Redis(),default_timeout=-1) # task is to sleep for 5 seconds
+
+num_of_threads_in_total = Worker.count(connection=Redis())
+
+
+def selection_driver(selected_queue,num_of_threads):
+
+    task_list = []
+
+    if selected_queue == str(1):
+        print("You have selected to parse csv files.")
+        for file in csv_files:
+            task = q_1.enqueue(do_csv_parse,file,searchFor)
+            task_list.append(task)
+
+        return task_list
+
+    elif selected_queue == str(2):
+
+        print("You have selected to split videos.")
+        print("------------------------------------------------")
+        list_returned = video_editing_logic.produce_video_split(num_of_threads=num_of_threads)
+        for i in list_returned:
+            task = q_2.enqueue(do_video_split.do_video_split,i)
+            task_list.append(task)
+        
+        return task_list
+
+    elif selected_queue == str(3):
+        print("You have selected to web scrape.")
+        for url in url_list:
+            task = q_3.enqueue(do_webscrape,url)
+            task_list.append(task)  
+    else:
+        print("Invalid queue")
+####################################################################################
 
 
 
-if num_of_threads <= 1:
+
+
+
+
+if num_of_threads_in_total <= 1:
     print("It seems that there is one thread running or less than one thread running. Goodbye.")
     sys.exit()
 else:
+    
     print("Welcome please select a queue to utilize.")
     
     print("1. Queue 1") 
@@ -72,40 +104,74 @@ else:
     print("3. Queue 3")
 
     selected_queue_val = input()
-    task_list = selection_driver(selected_queue_val,num_of_threads)
 
     if selected_queue_val == str(1):
-        print(selected_queue_val)
-        name_of_queue = "queue_one"
+        num_of_threads_for_queue = Worker.count(connection=Redis(), queue=q_1)
+        
+        if num_of_threads_for_queue == 0:
+            print(f"Execution time for items in queue: {q_1.name} is unknown.")
+            print(f"There are no workers listening to {q_1.name}, goodbye")
+            sys.exit()
+    
     elif selected_queue_val == str(2):
-        print(selected_queue_val)
-        name_of_queue = "queue_two"
+        num_of_threads_for_queue = Worker.count(connection=Redis(), queue=q_2)
+
+        if num_of_threads_for_queue == 0:
+            print(f"Execution time for items in queue: {q_2.name} is unknown.")
+            print(f"There are no workers listening to {q_2.name}, goodbye")
+            sys.exit()
+
     elif selected_queue_val == str(3):
-        print(selected_queue_val)
-        name_of_queue = "queue_three"
+        num_of_threads_for_queue = Worker.count(connection=Redis(), queue=q_3)
+
+        if num_of_threads_for_queue == 0:
+            print(f"Execution time for items in queue: {q_3.name} is unknown.")
+            print(f"There are no workers listening to {q_3.name}, goodbye")
+            sys.exit()
+
+    else:
+        num_of_threads_for_queue = Worker.count(connection=Redis(),queue=q_0)
+
+        if num_of_threads_for_queue == 0:
+            print(f"Execution time for items in queue: {q_0.name} is unknown.")
+            print(f"There are no workers listening to {q_0.name}, goodbye")
+            sys.exit()
+
+    selection_driver(selected_queue_val,num_of_threads_for_queue)
+    print("--------------------------------------------------")
+    print("Collecting workers who are working please wait... ")
+    time.sleep(3)
+
+    if selected_queue_val == str(1):
+        # = StartedJobRegistry(q_1.name,connection=Redis())
+        list_of_worker_working_on_q_n = q_1.started_job_registry.get_job_ids()
+        queue_name = q_1.name
     
+    elif selected_queue_val == str(2):
+        #registry = StartedJobRegistry(q_2.name,connection=Redis())
+        list_of_worker_working_on_q_n = q_2.started_job_registry.get_job_ids()
+        queue_name = q_2.name
     
-    start = datetime.now()
-    start_time = start.strftime("%H:%M:%S")
-
-    print("name of queue: ",name_of_queue)
-
-    #initialize current_jobs_executing
-    current_jobs_executing = StartedJobRegistry(name=str(name_of_queue),connection=Redis()).get_job_ids()
-    print(len(current_jobs_executing))
+    elif selected_queue_val == str(3):
+        #registry = StartedJobRegistry(q_3.name,connection=Redis())
+        list_of_worker_working_on_q_n = q_3.started_job_registry.get_job_ids()
+        queue_name = q_3.name           
     
-    while len(current_jobs_executing) != 0:
+    start_time = datetime.now()
 
-        current_jobs_executing = StartedJobRegistry(name=str(name_of_queue),connection=Redis()).get_job_ids()
+    print("Please wait while the tasks are being exected... ")
+    
 
-        #print(str(len(current_jobs_executing))+" running workers")
+    while len(list_of_worker_working_on_q_n) != 0:
+            list_of_worker_working_on_q_n = StartedJobRegistry(name=str(queue_name),connection=Redis())
 
 
-    end = datetime.now()
+    end_time = datetime.now()
 
-    final = end - start
+    final_time = end_time - start_time
 
-    print("Time taken " +str(final))
+    print("--------------------------------------------------")
+    print("Execution time for items in queue:",queue_name,"was:",final_time)
 
 
 
