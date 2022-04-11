@@ -19,17 +19,26 @@ import time
 from task_def import do_task_sleep
 
 from task_def import do_video_split
-
-
-########### From task_def folder #################################
-
+from task_def import do_csv_parse
+from task_def import do_webscrape
 
 ########### From producer_logic folder ###########################
 
 from producer_logic import video_editing_logic
 
-########### From producer_logic folder ###########################
 
+##################################################################
+
+#CONFIG
+
+# list of csv files to parse
+csv_files = ['../../csv_files/ADP_data.csv', '../../csv_files/AAL_data.csv', '../../csv_files/ABC_data.csv']
+searchFor = '2013'
+
+# list of urls to try for webscraping
+url_list = ['http://nvie.com', 'https://en.wikipedia.org/wiki/Main_Page']
+
+#######################################################################################################
 now = datetime.now()
 
 current_time = now.strftime("%H:%M:%S")
@@ -44,27 +53,35 @@ q_0 = Queue(name="queue_zero", connection=Redis(),default_timeout=-1) # task is 
 
 num_of_threads_in_total = Worker.count(connection=Redis())
 
-####################################################################################
 
 def selection_driver(selected_queue,num_of_threads):
 
+    task_list = []
+
     if selected_queue == str(1):
-        print("You have selected the csv reader")
-       # for i in range(0,num_of_threads):
-           # q_1.enqueue(do_task_1.do_task_function)
+        print("You have selected to parse csv files.")
+        for file in csv_files:
+            task = q_1.enqueue(do_csv_parse,file,searchFor)
+            task_list.append(task)
+
+        return task_list
 
     elif selected_queue == str(2):
 
         print("You have selected to split videos.")
         print("------------------------------------------------")
         list_returned = video_editing_logic.produce_video_split(num_of_threads=num_of_threads)
-        task_list = []
         for i in list_returned:
             task = q_2.enqueue(do_video_split.do_video_split,i)
             task_list.append(task)
         
         return task_list
 
+    elif selected_queue == str(3):
+        print("You have selected to web scrape.")
+        for url in url_list:
+            task = q_3.enqueue(do_webscrape,url)
+            task_list.append(task)  
     else:
         print("You have selected to sleep for 10 seconds.")
         for i in range(0,5):
