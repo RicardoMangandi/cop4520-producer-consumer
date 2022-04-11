@@ -17,32 +17,60 @@ from datetime import datetime
 ########### From task_def folder #################################
 
 from task_def import do_video_split
-
-########### From task_def folder #################################
-
+from task_def import do_csv_parse
+from task_def import do_webscrape
 
 ########### From producer_logic folder ###########################
 
 from producer_logic import video_editing_logic
 
-########### From producer_logic folder ###########################
 
+##################################################################
 
-####################################################################################
+#CONFIG
+
+# list of csv files to parse
+csv_files = ['../../csv_files/ADP_data.csv', '../../csv_files/AAL_data.csv', '../../csv_files/ABC_data.csv']
+searchFor = '2013'
+
+# list of urls to try for webscraping
+url_list = ['http://nvie.com', 'https://en.wikipedia.org/wiki/Main_Page']
+
+#######################################################################################################
+
 
 def selection_driver(selected_queue,num_of_threads):
-    if selected_queue == str(2):
+
+    task_list = []
+
+    if selected_queue == str(1):
+        print("You have selected to parse csv files.")
+        for file in csv_files:
+            task = q_1.enqueue(do_csv_parse,file,searchFor)
+            task_list.append(task)
+
+        return task_list
+
+    elif selected_queue == str(2):
 
         print("You have selected to split videos.")
         list_returned = video_editing_logic.produce_video_split(num_of_threads=num_of_threads)
-        task_list = []
         for i in list_returned:
             task = q_2.enqueue(do_video_split.do_video_split,i)
             task_list.append(task)
         
         return task_list
 
+    elif selected_queue == str(3):
+        print("You have selected to web scrape.")
+        for url in url_list:
+            task = q_3.enqueue(do_webscrape,url)
+            task_list.append(task)
 
+        return task_list
+        
+    else:
+        print("Invalid queue")
 ####################################################################################
 
 
@@ -108,16 +136,7 @@ else:
     print("Time taken " +str(final))
 
 
-<<<<<<< HEAD
-q_1 = Queue(name="queue_1", connection=Redis())
-=======
->>>>>>> c8089f5e6116f45abf8e1935d6f91426428d2ddf
 
 
 
-<<<<<<< HEAD
-#one enqueue into queue_one
-q_1.enqueue(do_task_1.do_task_function,1)
-=======
->>>>>>> c8089f5e6116f45abf8e1935d6f91426428d2ddf
 
