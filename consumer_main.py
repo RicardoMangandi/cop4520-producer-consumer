@@ -22,7 +22,7 @@ else:
 
 
     if int(task_number) == 1:
-        listen_on_queue_name = "queue_one"
+        listen_on_queue_name = "queue_1"
 
     elif int(task_number) == 2:
         listen_on_queue_name = "queue_two"
