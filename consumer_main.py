@@ -6,6 +6,7 @@ thread_number = input()
 
 print("Select the queue to consume from: ")
 
+print("0. queue_zero")
 print("1. queue_one")
 print("2. queue_two")
 print("3. queue_three")
@@ -19,14 +20,18 @@ if int(thread_number) > 10 and task_number > 3:
 
 else:
 
+
     if int(task_number) == 1:
         listen_on_queue_name = "queue_one"
 
     elif int(task_number) == 2:
         listen_on_queue_name = "queue_two"
 
-    else:
+    elif int(task_number) == 3:
         listen_on_queue_name = "queue_three"
+    
+    else:
+        listen_on_queue_name = "queue_zero"
 
     command = "python3 create_thread.py " + listen_on_queue_name
 

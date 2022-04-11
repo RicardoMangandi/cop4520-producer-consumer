@@ -16,7 +16,7 @@ import time
 
 ########### From task_def folder #################################
 
-from task_def import do_task_1
+from task_def import do_task_sleep
 
 from task_def import do_video_split
 
@@ -50,8 +50,8 @@ def selection_driver(selected_queue,num_of_threads):
 
     if selected_queue == str(1):
         print("You have selected the csv reader")
-        for i in range(0,num_of_threads):
-            q_1.enqueue(do_task_1.do_task_function)
+       # for i in range(0,num_of_threads):
+           # q_1.enqueue(do_task_1.do_task_function)
 
     elif selected_queue == str(2):
 
@@ -66,9 +66,9 @@ def selection_driver(selected_queue,num_of_threads):
         return task_list
 
     else:
-        print("Tester")
-        for i in range(0,10):
-            q_3.enqueue(do_task_1.do_task_function,i,i)
+        print("You have selected to sleep for 10 seconds.")
+        for i in range(0,5):
+            q_0.enqueue(do_task_sleep.do_task_function)
 
 ####################################################################################
 
@@ -85,6 +85,7 @@ else:
     
     print("Welcome please select a queue to utilize.")
     
+    print("0. Queue 0")
     print("1. Queue 1") 
     print("2. Queue 2")
     print("3. Queue 3")
@@ -141,7 +142,11 @@ else:
     elif selected_queue_val == str(3):
         #registry = StartedJobRegistry(q_3.name,connection=Redis())
         list_of_worker_working_on_q_n = q_3.started_job_registry.get_job_ids()
-        queue_name = q_3.name           
+        queue_name = q_3.name
+
+    else:
+        list_of_worker_working_on_q_n = q_0.started_job_registry.get_job_ids()
+        queue_name = q_0.name               
     
     start_time = datetime.now()
 
