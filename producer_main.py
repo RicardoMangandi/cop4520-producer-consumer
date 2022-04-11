@@ -108,16 +108,7 @@ else:
     print("Time taken " +str(final))
 
 
-<<<<<<< HEAD
-q_1 = Queue(name="queue_1", connection=Redis())
-=======
->>>>>>> c8089f5e6116f45abf8e1935d6f91426428d2ddf
 
 
 
-<<<<<<< HEAD
-#one enqueue into queue_one
-q_1.enqueue(do_task_1.do_task_function,1)
-=======
->>>>>>> c8089f5e6116f45abf8e1935d6f91426428d2ddf
 
