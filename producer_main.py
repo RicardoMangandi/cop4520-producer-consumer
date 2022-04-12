@@ -3,7 +3,6 @@ import queue
 from redis import Redis
 from rq import Queue, Worker
 from rq.registry import StartedJobRegistry
-
 ################# Redis Imports End Here ########################
 
 ############### Misc. Imports ####################################
@@ -32,8 +31,8 @@ from producer_logic import video_editing_logic
 #CONFIG
 
 # list of csv files to parse
-csv_files = ['../../csv_files/ADP_data.csv', '../../csv_files/AAL_data.csv', '../../csv_files/ABC_data.csv']
-searchFor = '2013'
+csv_files = ['./csv_files/ADP_data.csv', './csv_files/AAL_data.csv', './csv_files/ABC_data.csv']
+searchFor = '2014'
 
 # list of urls to try for webscraping
 url_list = ['http://nvie.com', 'https://en.wikipedia.org/wiki/Main_Page']
@@ -61,7 +60,7 @@ def selection_driver(selected_queue,num_of_threads):
     if selected_queue == str(1):
         print("You have selected to parse csv files.")
         for file in csv_files:
-            task = q_1.enqueue(do_csv_parse,file,searchFor)
+            task = q_1.enqueue(do_csv_parse.csv_count,file,searchFor)
             task_list.append(task)
 
         return task_list
@@ -80,7 +79,7 @@ def selection_driver(selected_queue,num_of_threads):
     elif selected_queue == str(3):
         print("You have selected to web scrape.")
         for url in url_list:
-            task = q_3.enqueue(do_webscrape,url)
+            task = q_3.enqueue(do_webscrape.count_words_at_url,url)
             task_list.append(task)  
     else:
         print("You have selected to sleep for 10 seconds.")
@@ -95,7 +94,7 @@ def selection_driver(selected_queue,num_of_threads):
 
 
 
-if num_of_threads_in_total <= 1:
+if num_of_threads_in_total <= 0:
     print("It seems that there is one thread running or less than one thread running. Goodbye.")
     sys.exit()
 else:
