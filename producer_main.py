@@ -1,8 +1,8 @@
 ############## Redis Imports Start Here ###########################
-import queue
 from redis import Redis
 from rq import Queue, Worker
 from rq.registry import StartedJobRegistry
+import pandas as pd
 ################# Redis Imports End Here ########################
 
 ############### Misc. Imports ####################################
@@ -26,7 +26,16 @@ from task_def import do_webscrape
 from producer_logic import video_editing_logic
 
 
+######################### From webscrappingfolder #########################################
+
+from webscraping import producer_one
+from webscraping import producer_two
+from webscraping import producer_three
+
 ##################################################################
+
+
+
 
 #CONFIG
 
@@ -74,13 +83,19 @@ def selection_driver(selected_queue,num_of_threads):
             task = q_2.enqueue(do_video_split.do_video_split,i)
             task_list.append(task)
         
-        return task_list
+        #return task_list
 
     elif selected_queue == str(3):
         print("You have selected to web scrape.")
-        for url in url_list:
-            task = q_3.enqueue(do_webscrape.count_words_at_url,url)
-            task_list.append(task)  
+        #for url in url_list:
+            #task = q_3.enqueue(do_webscrape.count_words_at_url,url)
+        task_1 = q_1.enqueue(producer_one.task_one)
+        task_2 = q_2.enqueue(producer_two.task_two)
+        task_3 = q_3.enqueue(producer_three.task_three)
+        task_list.append(task_1)
+        task_list.append(task_2)
+        task_list.append(task_3)
+
     else:
         print("You have selected to sleep for 10 seconds.")
         for i in range(0,5):
@@ -140,7 +155,7 @@ else:
             print(f"There are no workers listening to {q_0.name}, goodbye")
             sys.exit()
 
-    selection_driver(selected_queue_val,num_of_threads_for_queue)
+    task_results_list = selection_driver(selected_queue_val,num_of_threads_for_queue)
     print("--------------------------------------------------")
     print("Collecting workers who are working please wait... ")
     time.sleep(3)
@@ -172,6 +187,13 @@ else:
     while len(list_of_worker_working_on_q_n) != 0:
             list_of_worker_working_on_q_n = StartedJobRegistry(name=str(queue_name),connection=Redis())
 
+
+    if queue_name == "queue_three":
+        data_frame = []
+        for i in task_results_list:
+            print(i)
+            data_frame.append(i.result)
+        result = pd.concat(data_frame)
 
     end_time = datetime.now()
 
