@@ -79,9 +79,15 @@ def selection_driver(selected_queue,num_of_threads):
         print("You have selected to split videos.")
         print("------------------------------------------------")
         list_returned = video_editing_logic.produce_video_split(num_of_threads=num_of_threads)
-        for i in list_returned:
-            task = q_2.enqueue(do_video_split.do_video_split,i)
-            task_list.append(task)
+
+        if list_returned == None:
+            return None
+        
+        else:
+
+            for i in list_returned:
+                task = q_2.enqueue(do_video_split.do_video_split,i)
+                task_list.append(task)
         
         #return task_list
 
@@ -95,6 +101,8 @@ def selection_driver(selected_queue,num_of_threads):
         task_list.append(task_1)
         task_list.append(task_2)
         task_list.append(task_3)
+
+        return task_list
 
     else:
         print("You have selected to sleep for 10 seconds.")
@@ -158,7 +166,7 @@ else:
     task_results_list = selection_driver(selected_queue_val,num_of_threads_for_queue)
     print("--------------------------------------------------")
     print("Collecting workers who are working please wait... ")
-    time.sleep(3)
+    time.sleep(1)
 
     if selected_queue_val == str(1):
         # = StartedJobRegistry(q_1.name,connection=Redis())

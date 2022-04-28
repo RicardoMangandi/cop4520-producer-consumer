@@ -1,8 +1,12 @@
 import os
+import sys
 
 print("Enter the number of consumer threads, we are currently limited to 10: ")
 thread_number = input()
 
+if int(thread_number) > 10:
+    print("Invalid entry")
+    sys.exit()
 
 print("Select the queue to consume from: ")
 
@@ -15,8 +19,10 @@ task_number = input()
 
 listen_on_queue_name = ""
 
-if int(thread_number) > 10 and task_number > 3:
+if int(task_number) > 3:
     print("Invalid entry, goodbye")
+    sys.exit
+    
 
 else:
 
@@ -39,4 +45,4 @@ else:
         command = command + f"& python3 create_thread.py {listen_on_queue_name}"
 
 
-os.system(command)
+    os.system(command)
