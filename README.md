@@ -92,6 +92,16 @@ The application will then ask the user on what queue they would like to listen t
 
 The task_def folder is where we will write the code logic for each enqueue that occurs.
 
+#### To run the video editing which is queue two be sure to fix path inside video_editing_logic.py: 
+
+This is line 7 on video_editing_logic inside task_def folder.
+
+```Python
+file_location = "/Users/ricardomangandi/Downloads/scene-2.mov"
+```
+
+
+
 
 
 ### Conclusion for getting started simplified:
