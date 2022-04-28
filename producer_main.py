@@ -17,14 +17,10 @@ import time
 
 from task_def import do_task_sleep
 
-from task_def import do_video_split
+from task_def import video_editing_logic
 from task_def import do_csv_parse
 from task_def import do_webscrape
-
-########### From producer_logic folder ###########################
-
-from producer_logic import video_editing_logic
-
+from task_def import do_video_split
 
 ######################### From webscrappingfolder #########################################
 

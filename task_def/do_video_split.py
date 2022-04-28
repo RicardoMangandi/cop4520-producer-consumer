@@ -1,5 +1,3 @@
-
-
 import os
 from datetime import datetime
 
@@ -12,4 +10,4 @@ def do_video_split(string_command):
     end = datetime.now()
 
     final = end - start
-    return final
+    return 
