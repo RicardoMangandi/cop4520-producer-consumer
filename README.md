@@ -5,7 +5,7 @@
 
 The producer and consumer problem is an extremely popular programming paradigm. It is used for mult-process synchronization between more than one processes. There can be one producer and one consumer or multiple producers and multiple consumers. The data structure commanly used to solve this problem is a blocking queue. The producer enqueues items inside the queue and the consumer dequeues items from the queue.
 
-Our project goal is to show the practical application of blocking data structures in long running tasks. We are creating a Python application that will have a blocking queue represented by Redis, producers which are represented by the user, and consumer which are represented by Redis workers. Redis is an in-memory data structure store. Redis supports different kinds of abstract data structures such as lists, sets, stacks, and queues. Our main interest is being able to parallelize tasks with a queue and multiple workers. The tasks that are queued will be long tasks such as web-scrapping, heavy math computations, etc. 
+Our project goal is to show the practical application of blocking data structures in long running tasks. We are creating a Python application that will have a blocking queue represented by Redis, producers which are represented by the user, and consumer which are represented by Redis workers. Redis is an in-memory data structure store. Redis supports different kinds of abstract data structures such as lists, sets, stacks, and queues. Our main interest is being able to parallelize tasks with a queue and multiple workers. The tasks that are queued will be long tasks such as web-scrapping, video editing, and reading fron a csv.
 
 
 ![Screen Shot 2022-03-25 at 10 50 40 AM](https://user-images.githubusercontent.com/62866287/160144542-b5bd8c61-6034-44eb-8e1d-3e6518f036ef.png)
@@ -17,6 +17,8 @@ Our project goal is to show the practical application of blocking data structure
 ```bash 
 git clone https://github.com/RicardoMangandi/cop4520-producer-consumer.git
 ```
+
+Install FFMPEG for your operating system: https://www.ffmpeg.org/download.html
 
 Create a Python virtual environment and activate it. Once activated use the package manager [pip](https://pip.pypa.io/en/stable/) to install the required libraries used in the application.
 ```bash
@@ -59,11 +61,22 @@ rq-dashboard
 Then open up the web-browser and go to localhost:9181
 
 
+### Consumer
+
+To run the consumers and generate "working threads" we need to run the following python script  ```consumer_main.py```
+
+The application will ask the user how many threads they will like to spin up. We are limiting the user to a maximum of 10 threads.
+
+The application will then ask the user on what queue they would like to listen to. If the user specifies a queue that does not exist nor has items inside it the workers will remain idle and not work. Please run this script first.
+
+
+
 ### Producer
 
 To run the producer and enqueue items to a specific queue we need to run the following python script ```producer_main.py```
 
-The application at the moment does not ask the user for anything, but in the future we will ask what sort of task they would like to enqueue. Right now, the application just enqueues the task into queue_one and has the thread sleep.
+The application will ask the user on what queue they would like to listen to. Ensure that we are picking the queue that has active 
+workers listening on that queue or else the queued items will remain in queue regardless of how many consuming threads we have. 
 
 
 ### Consumer
@@ -80,14 +93,10 @@ The application will then ask the user on what queue they would like to listen t
 The task_def folder is where we will write the code logic for each enqueue that occurs.
 
 
-### kill_thread
-
-The kill_thread folder purpose is to allow the user to run python scripts to kill these threads or workers. Unfortunately they do not just die off whenever they are done unlike a normal thread. They have a different lifecycle due to this it very difficult to emulate the exact same thread behavior in this environment.
-
-
 
 ### Conclusion for getting started simplified:
 
+```ensure FFMPEG is installed```
 
 ```run command to start redis based on OS```
 
@@ -102,11 +111,11 @@ rq-dashboard
 ```open up localhost:9181```
 
 ```bash
-python3 producer_main.py
+python3 consumer_main.py
 ```
 
 ```bash
-python3 consumer_main.py
+python3 producer_main.py
 ```
 
 
